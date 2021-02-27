@@ -1,15 +1,36 @@
+import { useCallback, useMemo, useState } from "react";
 import { useBox } from "use-cannon";
-import { useRef } from "react";
-import { useFrame, useThree } from "react-three-fiber";
 
 export const Block = (props) => {
-  const { size, active } = props;
-  const [ref] = useBox(() => ({ mass: 1, position: [0, 5, 0] }));
+  const { size, active, color } = props;
+  const [isHovered, setIsHovered] = useState(false);
+  const collideFunc = useCallback((e) => {
+    console.log(e);
+  }, []);
+  const [ref] = useBox(() => ({
+    mass: 20,
+    args: size,
+    position: [0, 5, 0],
+  }));
 
   return (
-    <mesh ref={ref} castShadow receiveShadow>
-      <boxBufferGeometry attach="geometry" args={size}/>
-      <meshStandardMaterial color={"hotpink"} />
+    <mesh
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        console.log(isHovered, color, "hovered");
+        setIsHovered(true);
+      }}
+      onPointerOut={(e) => {
+        e.stopPropagation();
+        console.log(isHovered, color, "unhovered");
+        setIsHovered(false);
+      }}
+      ref={ref}
+      castShadow
+      receiveShadow
+    >
+      <boxBufferGeometry args={size}/>
+      <meshStandardMaterial color={isHovered ? "dodgerblue" : color} />
     </mesh>
   );
 };
