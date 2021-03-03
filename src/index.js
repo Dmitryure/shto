@@ -6,7 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { Canvas } from "react-three-fiber";
 
 ReactDOM.render(
-  <Canvas>
+  <Canvas shadowMap>
     <App />
   </Canvas>,
   document.getElementById("root")

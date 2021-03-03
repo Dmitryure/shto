@@ -2,15 +2,12 @@ import { useCallback, useMemo, useState } from "react";
 import { useBox } from "use-cannon";
 
 export const Block = (props) => {
-  const { size, active, color } = props;
+  const { size, color } = props;
   const [isHovered, setIsHovered] = useState(false);
-  const collideFunc = useCallback((e) => {
-    console.log(e);
-  }, []);
   const [ref] = useBox(() => ({
     mass: 20,
     args: size,
-    position: [0, 5, 0],
+    position: [0, 4, 0],
   }));
 
   return (
@@ -27,7 +24,6 @@ export const Block = (props) => {
       }}
       ref={ref}
       castShadow
-      receiveShadow
     >
       <boxBufferGeometry args={size}/>
       <meshStandardMaterial color={isHovered ? "dodgerblue" : color} />
