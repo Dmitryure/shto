@@ -17,6 +17,7 @@
     "react-use-gesture": "^9.0.4",
     "three": "^0.124.0",
     "use-cannon": "^0.5.3",
+    "uuid": "^8.3.2",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
