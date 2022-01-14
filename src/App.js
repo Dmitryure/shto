@@ -1,11 +1,13 @@
-import { Physics } from "use-cannon";
+import { Debug, Physics } from "@react-three/cannon";
 import { throttle } from "lodash";
-import { useCallback, useState } from "react";
-import { useFrame } from "react-three-fiber";
+import React, { useCallback, useState } from "react";
+import { useFrame } from "@react-three/fiber";
 import { Block } from "./components/Block";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import PlaneWithBorders from "./components/Plane";
-import palletes from "nice-color-palettes";
+
+import { J } from "./components/J";
+import { baseSizeUnit, colors, spawnPosition } from "./utils";
 
 function getRandomInt(min = 0, max) {
   if (!max) {
@@ -13,41 +15,42 @@ function getRandomInt(min = 0, max) {
   }
   min = Math.ceil(min);
   max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(Math.random() * (max - min) + min);
 }
 
-function randomXSide() {
-  return [0.3, 0.4, 0.5, 0.6, 0.7][getRandomInt(0, 4)];
-}
-
-function randomGenerationLocation() {
-  return [0, 1, 2, 3][getRandomInt(0,3)]
-}
+const generateBlock = () => {
+  const cube = {
+    type: "cube",
+    size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
+    position: spawnPosition,
+    active: false,
+    color: colors[getRandomInt(1, colors.length)],
+  };
+  const j = {
+    type: "j",
+    size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
+    position: spawnPosition,
+    active: false,
+    color: colors[getRandomInt(1, colors.length)],
+  };
+  const arr = [cube, j];
+  return arr[getRandomInt(0, arr.length)];
+};
 
 function App() {
-  const [boxes, setBoxes] = useState([]);
-  const colors = palletes[13];
+  const [blocks, setBlocks] = useState([]);
 
   const addBlock = useCallback(
     throttle(() => {
-      setBoxes((state) => {
-        console.log(state);
-        return [
-          ...state,
-          {
-            size: [randomXSide(), 0.5, randomXSide()],
-            position: { x: 0, y: 0 },
-            active: false,
-            color: colors[getRandomInt(1, colors.length - 1)],
-          },
-        ];
+      setBlocks((state) => {
+        return [...state, generateBlock()];
       });
     }, 800),
     []
   );
 
   useFrame(() => {
-    if (boxes.length < 100) {
+    if (blocks.length < 10) {
       addBlock();
     }
   });
@@ -58,18 +61,25 @@ function App() {
         shadow-mapSize-height={1024}
         shadow-mapSize-width={1024}
         castShadow
-        position={[2, 20, 30]}
+        position={[15, 15, 30]}
       />
-      <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
-      <PerspectiveCamera makeDefault position={[0, 2, 10]} />
+      <OrbitControls />
+      <PerspectiveCamera makeDefault position={[0, 5, 12]} />
       <Physics gravity={[0, -2, 0]}>
+        {/* <Debug color="black" scale={1.1}> */}
         <PlaneWithBorders color={colors[0]} />
         {[
-          ...boxes.slice(0, boxes.length - 1),
-          { ...boxes[boxes.length - 1], active: true },
+          ...blocks.slice(0, blocks.length - 1),
+          { ...blocks[blocks.length - 1], active: true },
         ].map((el, i) => {
-          return <Block key={i} {...el} />;
+          console.log(el.type, el);
+          if (el.type === "cube") {
+            return <Block key={i} {...el} />;
+          } else if (el.type === "j") {
+            return <J key={i} {...el} />;
+          }
         })}
+        {/* </Debug> */}
       </Physics>
     </>
   );

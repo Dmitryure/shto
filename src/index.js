@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { Canvas } from "react-three-fiber";
+import { Canvas } from "@react-three/fiber";
 
 ReactDOM.render(
   <Canvas shadowMap>
