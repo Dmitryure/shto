@@ -1,22 +1,18 @@
-import { useState } from "react";
-import { useBox } from "use-cannon";
-import { useSpring, animated } from "react-spring/three";
+import React, { useCallback, useMemo, useState } from "react";
+import { useBox } from "@react-three/cannon";
 
 export const Block = (props) => {
-  const { size, color, id, setActive, active } = props;
+  const { size, color, type } = props;
   const [isHovered, setIsHovered] = useState(false);
-  const { springedSize } = useSpring({
-    springedSize: active ? size.map((el) => el * 5) : size,
-  });
-  console.log(springedSize);
   const [ref] = useBox(() => ({
     mass: 20,
-    args: springedSize,
-    position: [0, 5, 0],
+    args: size,
+    position: [0, 4, 0],
   }));
 
+
   return (
-    <animated.mesh
+    <mesh
       onPointerOver={(e) => {
         e.stopPropagation();
         setIsHovered(true);
@@ -25,14 +21,11 @@ export const Block = (props) => {
         e.stopPropagation();
         setIsHovered(false);
       }}
-      onClick={() => {
-        setActive(id);
-      }}
       ref={ref}
       castShadow
     >
-      <animated.boxBufferGeometry args={springedSize} />
+      <boxBufferGeometry args={size}/>
       <meshStandardMaterial color={isHovered ? "dodgerblue" : color} />
-    </animated.mesh>
+    </mesh>
   );
 };

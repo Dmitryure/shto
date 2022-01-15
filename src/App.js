@@ -1,12 +1,17 @@
-import { Physics } from "use-cannon";
+import { Debug, Physics } from "@react-three/cannon";
 import { throttle } from "lodash";
-import { useCallback, useState } from "react";
-import { useFrame } from "react-three-fiber";
+import React, { useCallback, useState } from "react";
+import { useFrame } from "@react-three/fiber";
 import { Block } from "./components/Block";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import PlaneWithBorders from "./components/Plane";
-import { v4 as uuidv4 } from "uuid";
-import palletes from "nice-color-palettes";
+
+import { Zigzag } from "./components/Zigzag";
+import { baseSizeUnit, colors, spawnPosition } from "./utils";
+import { Long } from "./components/Long";
+import { Hook } from "./components/Hook";
+import { Lcube } from "./components/Lcube";
+import { T } from "./components/T";
 
 function getRandomInt(min = 0, max) {
   if (!max) {
@@ -14,50 +19,70 @@ function getRandomInt(min = 0, max) {
   }
   min = Math.ceil(min);
   max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(Math.random() * (max - min) + min);
 }
 
-function randomXSide() {
-  return [0.3, 0.4, 0.5, 0.6, 0.7][getRandomInt(0, 4)];
-}
+const generateBlock = () => {
+  const cube = {
+    type: "cube",
+    size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
+    position: spawnPosition,
+    active: false,
+    color: "#4974a5",
+  };
+  const zigzag = {
+    type: "zigzag",
+    size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
+    position: spawnPosition,
+    active: false,
+    color: "#16acea",
+  };
+  const long = {
+    type: "long",
+    size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
+    position: spawnPosition,
+    active: false,
+    color: "#e8d71e",
+  };
+  const hook = {
+    type: "hook",
+    size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
+    position: spawnPosition,
+    active: false,
+    color: "#d71b3b",
+  };
+  const lcube = {
+    type: "lcube",
+    size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
+    position: spawnPosition,
+    active: false,
+    color: "#1EE8D7",
+  };
+  const t = {
+    type: "t",
+    size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
+    position: spawnPosition,
+    active: false,
+    color: "#4203c9",
+  };
+  const arr = [cube, zigzag, long, hook, lcube, t];
+  return () => arr[getRandomInt(0, arr.length)];
+};
 
 function App() {
-  const [boxes, setBoxes] = useState([]);
-  const colors = palletes[13];
-
-  const setActive = (id) => {
-    setBoxes((state) => {
-      const newBoxes = state.map((el) => {
-        if (id === el.id) {
-          return { ...el, active: true };
-        } else {
-          return { ...el, active: false };
-        }
-      });
-      return newBoxes;
-    });
-  };
+  const [blocks, setBlocks] = useState([]);
 
   const addBlock = useCallback(
     throttle(() => {
-      setBoxes((state) => {
-        return [
-          ...state,
-          {
-            size: [randomXSide(), 0.5, randomXSide()],
-            position: { x: 0, y: 0 },
-            active: false,
-            color: colors[getRandomInt(1, colors.length - 1)],
-            id: uuidv4(),
-          },
-        ];
+      setBlocks((state) => {
+        return [...state, generateBlock()()];
       });
     }, 1800),
     []
   );
 
   useFrame(() => {
-    if (boxes.length < 100) {
+    if (blocks.length < 10) {
       addBlock();
     }
   });
@@ -68,15 +93,32 @@ function App() {
         shadow-mapSize-height={1024}
         shadow-mapSize-width={1024}
         castShadow
-        position={[2, 20, 30]}
+        position={[15, 15, 30]}
       />
-      <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
-      <PerspectiveCamera makeDefault position={[0, 2, 10]} />
+      <OrbitControls />
+      <PerspectiveCamera makeDefault position={[0, 5, 12]} />
       <Physics gravity={[0, -2, 0]}>
+        {/* <Debug color="black" scale={1.1}> */}
         <PlaneWithBorders color={colors[0]} />
-        {boxes.map((el, i) => {
-          return <Block setActive={setActive} key={el.id} {...el} />;
+        {[
+          ...blocks.slice(0, blocks.length - 1),
+          { ...blocks[blocks.length - 1], active: true },
+        ].map((el, i) => {
+          if (el.type === "cube") {
+            return <Block key={i} {...el} />;
+          } else if (el.type === "zigzag") {
+            return <Zigzag key={i} {...el} />;
+          } else if (el.type === "long") {
+            return <Long key={i} {...el} />;
+          } else if (el.type === "hook") {
+            return <Hook key={i} {...el} />;
+          } else if (el.type === "lcube") {
+            return <Lcube key={i} {...el} />;
+          } else if (el.type === "t") {
+            return <T key={i} {...el} />;
+          }
         })}
+        {/* </Debug> */}
       </Physics>
     </>
   );
