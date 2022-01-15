@@ -1,14 +1,14 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React from "react";
 import { useCompoundBody } from "@react-three/cannon";
 import { baseSizeUnit } from "../utils";
 
 const c1pos = [baseSizeUnit, 0, 0];
-const c2pos = [baseSizeUnit, baseSizeUnit, 0];
-const c3pos = [baseSizeUnit * 2, baseSizeUnit, 0];
+const c2pos = [baseSizeUnit * 2, 0, 0];
+const c3pos = [baseSizeUnit * 3, 0, 0];
 
-export const J = (props) => {
+export const Long = (props) => {
   const { size, color } = props;
-  const [ref, api] = useCompoundBody(() => ({
+  const [ref] = useCompoundBody(() => ({
     mass: 20,
     position: [0, 4, 0],
     shapes: [

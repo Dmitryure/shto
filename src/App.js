@@ -6,8 +6,12 @@ import { Block } from "./components/Block";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import PlaneWithBorders from "./components/Plane";
 
-import { J } from "./components/J";
+import { Zigzag } from "./components/Zigzag";
 import { baseSizeUnit, colors, spawnPosition } from "./utils";
+import { Long } from "./components/Long";
+import { Hook } from "./components/Hook";
+import { Lcube } from "./components/Lcube";
+import { T } from "./components/T";
 
 function getRandomInt(min = 0, max) {
   if (!max) {
@@ -18,23 +22,52 @@ function getRandomInt(min = 0, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
+console.log(colors.length);
 const generateBlock = () => {
   const cube = {
     type: "cube",
     size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
     position: spawnPosition,
     active: false,
-    color: colors[getRandomInt(1, colors.length)],
+    color: "#4974a5",
   };
-  const j = {
-    type: "j",
+  const zigzag = {
+    type: "zigzag",
     size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
     position: spawnPosition,
     active: false,
-    color: colors[getRandomInt(1, colors.length)],
+    color: "#16acea",
   };
-  const arr = [cube, j];
-  return arr[getRandomInt(0, arr.length)];
+  const long = {
+    type: "long",
+    size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
+    position: spawnPosition,
+    active: false,
+    color: "#e8d71e",
+  };
+  const hook = {
+    type: "hook",
+    size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
+    position: spawnPosition,
+    active: false,
+    color: "#d71b3b",
+  };
+  const lcube = {
+    type: "lcube",
+    size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
+    position: spawnPosition,
+    active: false,
+    color: "#1EE8D7",
+  };
+  const t = {
+    type: "t",
+    size: [baseSizeUnit, baseSizeUnit, baseSizeUnit],
+    position: spawnPosition,
+    active: false,
+    color: "#4203c9",
+  };
+  const arr = [cube, zigzag, long, hook, lcube, t];
+  return () => arr[getRandomInt(0, arr.length)];
 };
 
 function App() {
@@ -43,9 +76,9 @@ function App() {
   const addBlock = useCallback(
     throttle(() => {
       setBlocks((state) => {
-        return [...state, generateBlock()];
+        return [...state, generateBlock()()];
       });
-    }, 800),
+    }, 1800),
     []
   );
 
@@ -72,11 +105,18 @@ function App() {
           ...blocks.slice(0, blocks.length - 1),
           { ...blocks[blocks.length - 1], active: true },
         ].map((el, i) => {
-          console.log(el.type, el);
           if (el.type === "cube") {
             return <Block key={i} {...el} />;
-          } else if (el.type === "j") {
-            return <J key={i} {...el} />;
+          } else if (el.type === "zigzag") {
+            return <Zigzag key={i} {...el} />;
+          } else if (el.type === "long") {
+            return <Long key={i} {...el} />;
+          } else if (el.type === "hook") {
+            return <Hook key={i} {...el} />;
+          } else if (el.type === "lcube") {
+            return <Lcube key={i} {...el} />;
+          } else if (el.type === "t") {
+            return <T key={i} {...el} />;
           }
         })}
         {/* </Debug> */}
